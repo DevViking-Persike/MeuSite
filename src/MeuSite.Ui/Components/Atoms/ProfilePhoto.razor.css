@@ -1,0 +1,16 @@
+.profile-photo {
+    width: 12rem;
+    height: 12rem;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 0.2rem solid #e8b827;
+    flex-shrink: 0;
+    background-color: #e8b827;
+}
+
+.profile-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transform: scale(1.2);
+}

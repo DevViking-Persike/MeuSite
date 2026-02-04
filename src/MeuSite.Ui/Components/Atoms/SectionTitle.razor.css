@@ -1,0 +1,16 @@
+.section-title {
+    display: inline-block;
+    background-color: #e8b827;
+    padding: 0.375rem 2rem;
+    border-radius: 1.25rem;
+    margin: 1.5rem auto;
+    text-align: center;
+}
+
+.section-title h2 {
+    color: #1a1a1a;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 0.5px;
+}

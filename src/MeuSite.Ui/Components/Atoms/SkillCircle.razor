@@ -1,0 +1,20 @@
+<div class="skill-circle">
+    <svg viewBox="0 0 120 120">
+        <circle class="bg" cx="60" cy="60" r="54" />
+        <circle class="progress" cx="60" cy="60" r="54"
+                stroke-dasharray="@CircumferenceStr"
+                stroke-dashoffset="@DashOffsetStr"
+                style="stroke: #e8b827;" />
+    </svg>
+    <span class="percentage">@(Percentage)%</span>
+</div>
+
+@code {
+    [Parameter] public int Percentage { get; set; }
+
+    private double Circumference => 2 * Math.PI * 54;
+    private double DashOffset => Circumference - (Percentage / 100.0 * Circumference);
+
+    private string CircumferenceStr => Circumference.ToString(System.Globalization.CultureInfo.InvariantCulture);
+    private string DashOffsetStr => DashOffset.ToString(System.Globalization.CultureInfo.InvariantCulture);
+}

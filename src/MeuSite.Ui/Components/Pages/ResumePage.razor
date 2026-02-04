@@ -1,0 +1,34 @@
+@page "/"
+@inject ResumePageViewModel ViewModel
+
+@if (ViewModel.IsLoading)
+{
+    <div class="loading">
+        <p>Carregando...</p>
+    </div>
+}
+else if (ViewModel.ErrorMessage is not null)
+{
+    <div class="error">
+        <p>@ViewModel.ErrorMessage</p>
+    </div>
+}
+else
+{
+    <HeroSection />
+
+    <div class="middle-section">
+        <ContactSidebar />
+        <EducationSection />
+    </div>
+
+    <ExperienceSection />
+    <SkillsSection />
+}
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await ViewModel.LoadAsync();
+    }
+}

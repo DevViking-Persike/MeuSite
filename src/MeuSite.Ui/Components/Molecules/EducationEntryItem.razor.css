@@ -1,0 +1,26 @@
+.education-entry {
+    margin-bottom: 16px;
+}
+
+.education-entry .period {
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.education-entry .institution {
+    color: #e8b827;
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin: 2px 0 4px 0;
+}
+
+.education-entry ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.education-entry .degree {
+    color: #cccccc;
+    font-size: 0.85rem;
+}

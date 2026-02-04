@@ -1,0 +1,25 @@
+.contact-sidebar {
+    background-color: #2b2b2b;
+    padding: 1.5rem 1.25rem;
+    min-width: 220px;
+    max-width: 260px;
+}
+
+.sidebar-title {
+    color: #e8b827;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0 0 16px 0;
+}
+
+@@media (max-width: 768px) {
+    .contact-sidebar {
+        max-width: 100%;
+        min-width: unset;
+        padding: 1.5rem;
+    }
+
+    .sidebar-title {
+        text-align: center;
+    }
+}

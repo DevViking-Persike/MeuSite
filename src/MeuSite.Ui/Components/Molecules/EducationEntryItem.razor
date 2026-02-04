@@ -1,0 +1,13 @@
+<div class="education-entry">
+    <span class="period">@Period</span>
+    <h4 class="institution">@Institution</h4>
+    <ul>
+        <li class="degree">@Degree</li>
+    </ul>
+</div>
+
+@code {
+    [Parameter] public string Period { get; set; } = string.Empty;
+    [Parameter] public string Institution { get; set; } = string.Empty;
+    [Parameter] public string Degree { get; set; } = string.Empty;
+}

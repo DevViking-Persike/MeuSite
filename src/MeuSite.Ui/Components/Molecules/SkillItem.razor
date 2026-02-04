@@ -1,0 +1,9 @@
+<div class="skill-item">
+    <SkillCircle Percentage="@Percentage" />
+    <span class="skill-name">@Name</span>
+</div>
+
+@code {
+    [Parameter] public string Name { get; set; } = string.Empty;
+    [Parameter] public int Percentage { get; set; }
+}

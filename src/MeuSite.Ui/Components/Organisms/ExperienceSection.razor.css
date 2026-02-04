@@ -1,0 +1,31 @@
+.experience-section {
+    padding: 0 1.5rem 1.5rem 1.5rem;
+    background-color: #2b2b2b;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.experience-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+@@media (max-width: 900px) {
+    .experience-grid {
+        grid-template-columns: repeat(2, 1fr);
+        max-width: 700px;
+    }
+}
+
+@@media (max-width: 600px) {
+    .experience-grid {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+    }
+}

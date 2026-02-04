@@ -1,0 +1,14 @@
+<span class="contact-icon" aria-hidden="true">@IconChar</span>
+
+@code {
+    [Parameter] public string Type { get; set; } = string.Empty;
+
+    private string IconChar => Type switch
+    {
+        "phone" => "\u260E",
+        "address" => "\u2302",
+        "email" => "\u2709",
+        "website" => "\u2B24",
+        _ => "\u2022"
+    };
+}

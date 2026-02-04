@@ -1,0 +1,29 @@
+## .NET
+**/bin/
+**/obj/
+**/artifacts/
+
+## IDE
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+## macOS
+.DS_Store
+Thumbs.db
+
+## Env
+.env
+*.local
+
+## Build
+artifacts/
+
+## Images temp
+*.jpg
+*.png
+!src/**/wwwroot/**/*.jpg
+!src/**/wwwroot/**/*.png
+!src/**/wwwroot/**/*.svg

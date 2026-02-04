@@ -1,0 +1,9 @@
+@inject ResumePageViewModel ViewModel
+
+<aside class="contact-sidebar">
+    <h3 class="sidebar-title">Contato</h3>
+    <ContactItem Label="Celular" Value="@ViewModel.Contact.Phone" />
+    <ContactItem Label="Endereço" Value="@ViewModel.Contact.Address" />
+    <ContactItem Label="Email" Value="@ViewModel.Contact.Email" />
+    <ContactItem Label="Website" Value="@ViewModel.Contact.Website" />
+</aside>

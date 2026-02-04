@@ -1,0 +1,8 @@
+<div class="profile-photo">
+    <img src="@Src" alt="@Alt" />
+</div>
+
+@code {
+    [Parameter] public string Src { get; set; } = "images/profile-placeholder.svg";
+    [Parameter] public string Alt { get; set; } = "Profile photo";
+}

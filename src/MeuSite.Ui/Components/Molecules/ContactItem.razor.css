@@ -1,0 +1,18 @@
+.contact-item {
+    margin-bottom: 16px;
+}
+
+.contact-label {
+    color: #e8b827;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+}
+
+.contact-value {
+    color: #cccccc;
+    font-size: 0.85rem;
+    margin: 0;
+    line-height: 1.4;
+    word-break: break-word;
+}

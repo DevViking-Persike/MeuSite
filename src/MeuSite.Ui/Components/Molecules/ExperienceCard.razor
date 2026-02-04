@@ -1,0 +1,12 @@
+<div class="experience-card">
+    <h4 class="company">@Company</h4>
+    <p class="role-period">@Role @Period</p>
+    <p class="description">@Description</p>
+</div>
+
+@code {
+    [Parameter] public string Company { get; set; } = string.Empty;
+    [Parameter] public string Role { get; set; } = string.Empty;
+    [Parameter] public string Period { get; set; } = string.Empty;
+    [Parameter] public string Description { get; set; } = string.Empty;
+}

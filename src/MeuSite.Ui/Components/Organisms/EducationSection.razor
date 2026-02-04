@@ -1,0 +1,15 @@
+@inject ResumePageViewModel ViewModel
+
+<section class="education-section">
+    <div class="section-header">
+        <SectionTitle Title="Educação" />
+    </div>
+    <div class="education-grid">
+        @foreach (var entry in ViewModel.Education)
+        {
+            <EducationEntryItem Period="@entry.Period"
+                                Institution="@entry.Institution"
+                                Degree="@entry.Degree" />
+        }
+    </div>
+</section>

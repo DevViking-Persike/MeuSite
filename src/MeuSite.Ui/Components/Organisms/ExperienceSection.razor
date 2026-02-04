@@ -1,0 +1,16 @@
+@inject ResumePageViewModel ViewModel
+
+<section class="experience-section">
+    <div class="section-header">
+        <SectionTitle Title="Experiências" />
+    </div>
+    <div class="experience-grid">
+        @foreach (var exp in ViewModel.Experiences)
+        {
+            <ExperienceCard Company="@exp.Company"
+                            Role="@exp.Role"
+                            Period="@exp.Period"
+                            Description="@exp.Description" />
+        }
+    </div>
+</section>

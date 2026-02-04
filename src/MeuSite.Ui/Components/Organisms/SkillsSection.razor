@@ -1,0 +1,13 @@
+@inject ResumePageViewModel ViewModel
+
+<section class="skills-section">
+    <div class="section-header">
+        <SectionTitle Title="Skills" />
+    </div>
+    <div class="skills-row">
+        @foreach (var skill in ViewModel.Skills)
+        {
+            <SkillItem Name="@skill.Name" Percentage="@skill.Percentage" />
+        }
+    </div>
+</section>
