@@ -41,10 +41,14 @@ show_help() {
     echo "  build         - Compila projetos"
     echo "  build-android - Gera AAB/APK para Google Play"
     echo ""
+    echo -e "${GREEN}Testes:${NC}"
+    echo "  test      - Testes unitarios + bUnit"
+    echo "  test-e2e  - Testes E2E (Playwright)"
+    echo "  test-all  - Todos os testes"
+    echo ""
     echo -e "${GREEN}Manutencao:${NC}"
     echo "  restore   - Restaura dependencias"
     echo "  clean     - Limpa artefatos"
-    echo "  test      - Executa testes"
     echo "  status    - Status dos servicos"
     echo "  stop      - Para processos dotnet"
     echo ""
@@ -111,6 +115,12 @@ case "${1:-help}" in
         ;;
     test)
         "$SCRIPTS_DIR/utils.sh" test
+        ;;
+    test-e2e|e2e)
+        "$SCRIPTS_DIR/utils.sh" test-e2e
+        ;;
+    test-all)
+        "$SCRIPTS_DIR/utils.sh" test-all
         ;;
     status)
         "$SCRIPTS_DIR/utils.sh" status

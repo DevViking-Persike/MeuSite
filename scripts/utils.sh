@@ -49,7 +49,7 @@ restore_packages() {
 }
 
 test_projects() {
-    log_info "Executando testes..."
+    log_info "Executando testes unitários + bUnit..."
     cd "$PROJECT_DIR" && dotnet test "$TESTS_DIR/MeuSite.Tests.csproj"
 
     if [ $? -eq 0 ]; then
@@ -58,6 +58,24 @@ test_projects() {
         log_error "Alguns testes falharam."
         exit 1
     fi
+}
+
+test_e2e() {
+    log_info "Executando testes E2E (Playwright)..."
+    log_warn "O servidor web deve estar rodando em http://localhost:7007"
+    cd "$PROJECT_DIR" && dotnet test "$E2E_DIR/MeuSite.E2E.csproj"
+
+    if [ $? -eq 0 ]; then
+        log_info "Todos os testes E2E passaram!"
+    else
+        log_error "Alguns testes E2E falharam."
+        exit 1
+    fi
+}
+
+test_all() {
+    test_projects
+    test_e2e
 }
 
 # Comandos
@@ -69,13 +87,17 @@ case "$COMMAND" in
     clean)    clean_projects ;;
     restore)  restore_packages ;;
     test)     test_projects ;;
+    test-e2e) test_e2e ;;
+    test-all) test_all ;;
     *)
-        echo "Uso: $0 [status|stop|clean|restore|test]"
+        echo "Uso: $0 [status|stop|clean|restore|test|test-e2e|test-all]"
         echo "  status   - Mostra status dos serviços (padrão)"
         echo "  stop     - Para todos os processos dotnet"
         echo "  clean    - Remove pastas bin/obj"
         echo "  restore  - Restaura pacotes NuGet"
-        echo "  test     - Executa testes unitários"
+        echo "  test     - Executa testes unitários + bUnit"
+        echo "  test-e2e - Executa testes E2E (Playwright)"
+        echo "  test-all - Executa todos os testes"
         exit 1
         ;;
 esac

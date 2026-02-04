@@ -11,6 +11,7 @@ MAUI_DIR="$SRC_DIR/MeuSite.Maui"
 SHARED_DIR="$SRC_DIR/MeuSite.Shared"
 UI_DIR="$SRC_DIR/MeuSite.Ui"
 TESTS_DIR="$PROJECT_DIR/tests/MeuSite.Tests"
+E2E_DIR="$PROJECT_DIR/tests/MeuSite.E2E"
 SLN_FILE="$PROJECT_DIR/MeuSite.sln"
 
 PACKAGE_NAME="com.victorpersike.meusite"
