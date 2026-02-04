@@ -1,0 +1,200 @@
+name: Release Management
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number (e.g., 1.0.0)'
+        required: true
+        type: string
+      description:
+        description: 'Release description'
+        required: false
+        type: string
+        default: ''
+
+env:
+  MAX_RELEASES: 3
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Validate version format
+        run: |
+          if [[ ! "${{ inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "Error: Version must be in format X.Y.Z (e.g., 1.0.0)"
+            exit 1
+          fi
+
+      - name: Checkout dev branch
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Check if tag already exists
+        run: |
+          if git rev-parse "v${{ inputs.version }}" >/dev/null 2>&1; then
+            echo "Error: Tag v${{ inputs.version }} already exists"
+            exit 1
+          fi
+
+      - name: Create release branch
+        run: |
+          git checkout -b release/v${{ inputs.version }}
+          git push origin release/v${{ inputs.version }}
+
+      - name: Create and push tag
+        run: |
+          git tag -a "v${{ inputs.version }}" -m "Release v${{ inputs.version }}"
+          git push origin "v${{ inputs.version }}"
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          # Get commits since last tag
+          LAST_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+
+          if [ -n "$LAST_TAG" ]; then
+            COMMITS=$(git log ${LAST_TAG}..HEAD --pretty=format:"- %s" --no-merges)
+          else
+            COMMITS=$(git log --pretty=format:"- %s" --no-merges -20)
+          fi
+
+          # Create release notes
+          NOTES="## Release v${{ inputs.version }}"
+          NOTES="${NOTES}\n\n"
+
+          if [ -n "${{ inputs.description }}" ]; then
+            NOTES="${NOTES}${{ inputs.description }}\n\n"
+          fi
+
+          NOTES="${NOTES}### Changes\n${COMMITS}"
+
+          echo "notes<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$NOTES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ inputs.version }}
+          name: Release v${{ inputs.version }}
+          body: ${{ steps.release_notes.outputs.notes }}
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  merge-to-main:
+    name: Merge to Main
+    needs: create-release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge release to main
+        run: |
+          git fetch origin release/v${{ inputs.version }}
+          git merge origin/release/v${{ inputs.version }} --no-ff -m "Merge release v${{ inputs.version }} to main"
+          git push origin main
+
+      - name: Delete release branch
+        run: |
+          git push origin --delete release/v${{ inputs.version }} || true
+
+  trigger-builds:
+    name: Trigger Build Workflows
+    needs: merge-to-main
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
+
+    steps:
+      - name: Trigger Docker Build
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'docker-publish.yml',
+              ref: 'main'
+            });
+            console.log('Docker workflow triggered');
+
+  cleanup-old-releases:
+    name: Cleanup Old Releases
+    needs: [merge-to-main, trigger-builds]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Delete old releases (keep last 3)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Fetching releases..."
+
+          # Get all releases sorted by created date (newest first)
+          RELEASES=$(gh release list --limit 100 --json tagName,createdAt --jq 'sort_by(.createdAt) | reverse | .[].tagName')
+
+          # Count releases
+          RELEASE_COUNT=$(echo "$RELEASES" | wc -l | tr -d ' ')
+          echo "Total releases: $RELEASE_COUNT"
+
+          if [ "$RELEASE_COUNT" -gt "${{ env.MAX_RELEASES }}" ]; then
+            # Get releases to delete (all except the first MAX_RELEASES)
+            TO_DELETE=$(echo "$RELEASES" | tail -n +$((${{ env.MAX_RELEASES }} + 1)))
+
+            echo "Releases to delete:"
+            echo "$TO_DELETE"
+
+            for TAG in $TO_DELETE; do
+              echo "Deleting release and tag: $TAG"
+              gh release delete "$TAG" --yes --cleanup-tag || true
+            done
+
+            echo "Cleanup complete. Kept the ${{ env.MAX_RELEASES }} most recent releases."
+          else
+            echo "No cleanup needed. Only $RELEASE_COUNT releases exist."
+          fi
+
+      - name: List remaining releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Current releases:"
+          gh release list
