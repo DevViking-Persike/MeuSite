@@ -4,8 +4,10 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "7007:7007"
+      - "5173:5173"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:7007
+      - NODE_ENV=production
+      - HOST=0.0.0.0
+      - PORT=5173
+      - MEUSITE_BACKEND_PROVIDER=static
     restart: unless-stopped

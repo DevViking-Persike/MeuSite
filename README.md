@@ -1,127 +1,77 @@
-# MeuSite
+# MeuSite — Portfolio Victor Persike
 
-Site portfólio pessoal de Victor Persike, construído com **.NET 9 MAUI Blazor Hybrid + Blazor Server**. Uma única base de código compartilhada que roda na Web e como app nativo (Android, iOS, macOS).
+Currículo/portfólio web com SSR, construído em **SvelteKit 2 + Svelte 5**.
 
-## Arquitetura
-
-```
-MeuSite/
-├── src/
-│   ├── MeuSite.Shared      # Contratos, interfaces e DTOs (sem implementação)
-│   ├── MeuSite.Ui           # Razor Class Library - componentes Blazor compartilhados
-│   ├── MeuSite.Web          # Blazor Server (host web)
-│   └── MeuSite.Maui         # MAUI Blazor Hybrid (app nativo)
-├── tests/
-│   └── MeuSite.Tests        # Testes unitários (xUnit)
-├── docs/adr/                # Architecture Decision Records
-├── scripts/                 # Scripts de automação
-├── Dockerfile               # Build multi-stage para produção
-├── docker-compose.yml       # Orquestração Docker
-└── run.sh                   # Script principal de execução
-```
-
-## Padrões
-
-- **Atomic Design** - Componentes organizados em Atoms, Molecules, Organisms, Templates e Pages
-- **MVVM** - ViewModels injetados via DI nos componentes Razor
-- **Separation of Concerns** - `MeuSite.Shared` contém apenas contratos; implementações concretas ficam em `Web` e `Maui`
-
-## Stack
-
-| Tecnologia | Uso |
-|---|---|
-| .NET 9 | Runtime e SDK |
-| Blazor Server | Renderização web (InteractiveServer) |
-| MAUI Blazor Hybrid | App nativo via BlazorWebView |
-| Razor Class Library | Componentes UI compartilhados |
-| xUnit | Testes unitários |
-| Docker | Containerização |
+A arquitetura segue o modelo do projeto SeguraPro: design system atômico, camadas hexagonais no servidor (domain / application / infrastructure) e factory de repositórios selecionada por variável de ambiente.
 
 ## Pré-requisitos
 
-- [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0)
-- [Docker](https://www.docker.com/) (opcional, para rodar via container)
-
-Para MAUI (opcional):
-- Xcode (iOS/macOS)
-- Android SDK (Android)
+- Node 22+
+- pnpm 10 (`corepack enable`)
 
 ## Como rodar
 
-### Via script
-
 ```bash
-./run.sh web          # Inicia o servidor web (porta 7007)
-./run.sh all          # Dev mode com hot reload
-./run.sh build        # Compila os projetos
-./run.sh test         # Executa testes
-./run.sh clean        # Limpa artefatos de build
-./run.sh              # Mostra todos os comandos disponíveis
+pnpm install
+pnpm dev          # http://localhost:5173
 ```
 
-### Via Docker
+## Build de produção
 
 ```bash
-docker compose up --build
-```
-
-Acesse: http://localhost:7007
-
-### Via dotnet CLI
-
-```bash
-dotnet run --project src/MeuSite.Web
-```
-
-## Comandos disponíveis (run.sh)
-
-| Comando | Descrição |
-|---|---|
-| `web` | Servidor web na porta 7007 |
-| `all` | Dev mode com hot reload |
-| `build` | Compila Web e Tests |
-| `test` | Executa testes unitários |
-| `maui` | App no MacCatalyst |
-| `ios` | App no iOS Simulator |
-| `android` | App no Android |
-| `emu-list` | Lista emuladores Android |
-| `sim-list` | Lista simuladores iOS |
-| `clean` | Limpa bin/obj |
-| `restore` | Restaura pacotes NuGet |
-| `status` | Status dos serviços |
-| `stop` | Para processos dotnet |
-
-## Testes
-
-```bash
-./run.sh test
-# ou
-dotnet test tests/MeuSite.Tests
+pnpm build
+pnpm start        # node build/index.js
 ```
 
 ## Docker
 
-Build multi-stage com SDK para compilação e ASP.NET runtime para execução:
-
 ```bash
-# Build e execução
-docker compose up --build -d
-
-# Parar
+docker compose up -d   # http://localhost:5173
+docker compose logs -f web
 docker compose down
 ```
 
-## Estrutura de componentes (Atomic Design)
+## Script utilitário
 
-```
-MeuSite.Ui/Components/
-├── Atoms/           # ProfilePhoto, SkillCircle, SectionTitle, DecorativeDots
-├── Molecules/       # ContactItem, EducationEntryItem, ExperienceCard, SkillItem
-├── Organisms/       # HeroSection, ContactSidebar, EducationSection, ExperienceSection, SkillsSection
-├── Templates/       # ResumeLayout
-└── Pages/           # ResumePage
+```bash
+./run.sh help
+./run.sh dev
+./run.sh build
+./run.sh docker-up
 ```
 
-## Licença
+## Variáveis de ambiente
 
-Projeto pessoal de Victor Persike.
+| Var                          | Default  | Descrição                                    |
+| ---------------------------- | -------- | -------------------------------------------- |
+| `MEUSITE_BACKEND_PROVIDER`   | `static` | Repositório de dados (atualmente só estático) |
+| `BASE_PATH`                  | (vazio)  | Prefixo de rota (ex.: `/portfolio`)          |
+| `PORT`                       | `5173`   | Porta do servidor adapter-node               |
+| `HOST`                       | `0.0.0.0`| Host do servidor adapter-node                |
+
+## Estrutura
+
+```
+src/
+├── app.html / app.css / app.d.ts / hooks.server.ts
+├── lib/
+│   ├── core/{models,utils,navigation.ts}
+│   ├── platform/runtime.ts
+│   ├── design-system/{atoms,molecules,organisms,templates}/
+│   ├── features/resume/view/
+│   └── server/
+│       ├── shared/config/
+│       └── resume/{domain,application,infrastructure}/
+└── routes/
+    ├── +layout.svelte
+    ├── +page.server.ts   # SSR loader
+    └── +page.svelte
+```
+
+## Convenções
+
+- **SSR-first**: dados carregados em `+page.server.ts` via use case
+- **Hexagonal**: `domain` (interface) → `application` (use case) → `infrastructure` (impl + factory)
+- **Atomic design**: atoms → molecules → organisms → templates
+- **CSS Modules** + `var(--token)` em `app.css`
+- **Svelte 5 runes** (`$state`, `$derived`, `$props`)

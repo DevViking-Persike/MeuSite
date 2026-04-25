@@ -1,0 +1,30 @@
+.section {
+  padding: 80px 32px;
+  background:
+    linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.012) 50%, transparent),
+    var(--bg-app);
+  scroll-margin-top: 72px;
+}
+
+.inner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 800px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .section {
+    padding: 56px 20px;
+  }
+}

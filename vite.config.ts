@@ -1,0 +1,14 @@
+import { defineConfig } from 'vitest/config';
+import { sveltekit } from '@sveltejs/kit/vite';
+
+export default defineConfig({
+  plugins: [sveltekit()],
+  resolve: {
+    alias: {
+      $routes: '/src/routes'
+    }
+  },
+  test: {
+    include: ['tests/unit/**/*.test.ts']
+  }
+});

@@ -1,7 +1,20 @@
-## .NET
-**/bin/
-**/obj/
-**/artifacts/
+## Node
+node_modules/
+.pnpm-store/
+
+## SvelteKit
+.svelte-kit/
+build/
+.vercel/
+
+## Vite
+.vite/
+
+## Env
+.env
+.env.*
+!.env.example
+*.local
 
 ## IDE
 .vs/
@@ -14,16 +27,7 @@
 .DS_Store
 Thumbs.db
 
-## Env
-.env
-*.local
-
-## Build
-artifacts/
-
-## Images temp
-*.jpg
-*.png
-!src/**/wwwroot/**/*.jpg
-!src/**/wwwroot/**/*.png
-!src/**/wwwroot/**/*.svg
+## Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*

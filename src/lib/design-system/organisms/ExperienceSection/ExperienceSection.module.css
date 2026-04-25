@@ -1,0 +1,24 @@
+.section {
+  padding: 80px 32px;
+  scroll-margin-top: 72px;
+}
+
+.inner {
+  max-width: var(--container-max);
+  margin: 0 auto;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+@media (max-width: 600px) {
+  .section {
+    padding: 56px 20px;
+  }
+  .timeline {
+    gap: 14px;
+  }
+}

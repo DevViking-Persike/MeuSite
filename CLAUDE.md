@@ -1,89 +1,75 @@
-# MeuSite - Portfolio Victor Persike
+# MeuSite — Portfolio Victor Persike
 
-Solução .NET 9 com MAUI Blazor Hybrid + Blazor Web, compartilhando UI via Razor Class Library.
+Currículo/portfólio em **SvelteKit 2 + Svelte 5** com SSR (`adapter-node`), seguindo a arquitetura do projeto SeguraPro: design system atômico + camadas hexagonais no servidor + factory de repositórios.
 
-## Arquitetura
+## Estrutura
 
 ```
 MeuSite/
-├── claude.md                    # Este arquivo
-├── MeuSite.sln                 # Solução principal
-├── docs/
-│   └── adr/                    # Architecture Decision Records
+├── package.json / svelte.config.js / vite.config.ts / tsconfig.json
+├── Dockerfile / docker-compose.yml / run.sh
+├── static/
+│   ├── images/        # profile.jpg, favicon.svg, profile-placeholder.svg
+│   └── docs/          # curriculo-persike.pdf
 ├── src/
-│   ├── MeuSite.Shared/         # Contratos, interfaces, models/DTOs
-│   ├── MeuSite.Ui/             # RCL: Componentes Blazor (Atomic Design) + ViewModels
-│   ├── MeuSite.Maui/           # Host MAUI Blazor Hybrid
-│   └── MeuSite.Web/            # Host Blazor Server
-└── tests/
-    └── MeuSite.Tests/          # Testes unitários (xUnit)
+│   ├── app.html / app.css / app.d.ts
+│   ├── hooks.server.ts
+│   ├── lib/
+│   │   ├── core/
+│   │   │   ├── models/     # tipos TS (ResumeModel, ContactInfo…)
+│   │   │   ├── utils/      # helpers (skill-ring)
+│   │   │   └── navigation.ts
+│   │   ├── platform/runtime.ts
+│   │   ├── design-system/  # atoms → molecules → organisms → templates
+│   │   ├── features/
+│   │   │   └── resume/view/ResumeView.svelte
+│   │   └── server/
+│   │       ├── shared/config/server-config.ts
+│   │       └── resume/
+│   │           ├── domain/resume-repository.ts          # interface
+│   │           ├── application/get-resume.ts            # use case
+│   │           └── infrastructure/
+│   │               ├── static-resume-repository.ts      # dados hardcoded
+│   │               └── resume-repository-factory.ts
+│   └── routes/
+│       ├── +layout.svelte
+│       ├── +page.server.ts   # carrega resume via factory
+│       └── +page.svelte
+└── src.dotnet-backup/        # backup da versão .NET (descartável)
 ```
 
-## Padrões Adotados
+## Padrões obrigatórios
 
-- **Atomic Design**: Atoms → Molecules → Organisms → Templates → Pages
-- **MVVM**: ViewModels injetados via DI nos componentes Razor
-- **Shared Contracts**: MeuSite.Shared contém apenas interfaces e DTOs
-- **Implementações concretas**: Cada host (MAUI/Web) implementa IResumeDataProvider
+- **SSR-first**: dados carregados em `+page.server.ts` via use case
+- **Hexagonal server**: domain (interface) → application (use case) → infrastructure (impl + factory)
+- **Factory por env**: `MEUSITE_BACKEND_PROVIDER=static` (default) decide repositório
+- **Design system atômico**: atoms → molecules → organisms → templates
+- **CSS Modules**: cada componente com `.module.css`, sem `<style>` inline
+- **CSS tokens**: `var(--token)` definidos em `src/app.css`
+- **Svelte 5 runes**: `$state()`, `$derived()`, `$props()`
 
-## Como Rodar
-
-### Web (Blazor Server)
-```bash
-cd src/MeuSite.Web
-dotnet run
-# Acesse https://localhost:5001 (ou a porta indicada no terminal)
-```
-
-### MAUI (Mac Catalyst)
-```bash
-dotnet build src/MeuSite.Maui -f net9.0-maccatalyst
-dotnet build src/MeuSite.Maui -f net9.0-maccatalyst -t:Run
-```
-
-### MAUI (Android)
-```bash
-dotnet build src/MeuSite.Maui -f net9.0-android
-```
-
-## Build da Solução Completa
-
-```bash
-# Build apenas Web + Shared + Ui + Tests (recomendado no dev diário)
-dotnet build MeuSite.sln -p:TargetFramework=net9.0 --no-incremental
-
-# Build Web isolado
-dotnet build src/MeuSite.Web
-
-# Build MAUI (requer workload maui)
-dotnet build src/MeuSite.Maui -f net9.0-maccatalyst
-```
-
-## Testes
+## Como rodar
 
 ```bash
-dotnet test tests/MeuSite.Tests
+pnpm install              # ou ./run.sh install
+pnpm dev                  # http://localhost:5173
+
+pnpm build && pnpm start  # produção (adapter-node)
+
+docker compose up -d      # produção em container
 ```
-
-## Publicar Web
-
-```bash
-dotnet publish src/MeuSite.Web -c Release -o ./publish
-```
-
-## Decisões Arquiteturais
-
-Veja `/docs/adr/` para todas as ADRs:
-- 0001: UI compartilhada entre MAUI e Web
-- 0002: Abordagem MVVM em Blazor
-- 0003: Estratégia de hosting MAUI Blazor Hybrid
-- 0004: Atomic Design para componentes
 
 ## Stack
 
-- .NET 9
-- Blazor Server (Web)
-- .NET MAUI Blazor Hybrid
-- Razor Class Library
-- xUnit (testes)
-- CSS Isolation (scoped CSS)
+- SvelteKit 2 + Svelte 5
+- TypeScript 5
+- Vite 6
+- adapter-node 5
+- Vitest
+
+## O que NÃO fazer
+
+- Não usar `<style>` inline nos `.svelte` (CSS Modules ou tokens em `app.css`)
+- Não hardcodear cores hex (usar `var(--token)`)
+- Não ler dados em `+page.svelte` — usar `+page.server.ts` + use case
+- Não importar dados estáticos diretamente nas views (passar via `$props()`)

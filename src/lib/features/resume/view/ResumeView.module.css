@@ -1,0 +1,9 @@
+.middle-section {
+  display: flex;
+}
+
+@media (max-width: 768px) {
+  .middle-section {
+    flex-direction: column;
+  }
+}
